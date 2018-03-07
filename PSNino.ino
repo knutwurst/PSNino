@@ -25,8 +25,8 @@
 //               Chip select
 //--------------------------------------------------
 
-#define ATTINY
-//#define ARDUINO_BOARD
+// #define ATTINY
+// #define ARDUINO_BOARD
 
 
 #ifdef ARDUINO_BOARD
@@ -44,11 +44,10 @@
 #define GATE_PIN 4            //The GATE_PIN control
 #define DELAY_BETWEEN_BITS 4
 #define DELAY_BETWEEN_INJECTIONS 90
-#define LED_PIN 3             //Blinks on every single Inject
+#define LED_PIN 1             //Blinks on every single Inject
 #endif
 
-bool readBitFromByteSet(int index, const unsigned char *ByteSet)
-{
+bool readBitFromByteSet(int index, const unsigned char *ByteSet) {
   int byte_index = index >> 3;
   byte bits = pgm_read_byte(&(ByteSet[byte_index]));
   int bit_index = index & 0x7;
@@ -56,21 +55,17 @@ bool readBitFromByteSet(int index, const unsigned char *ByteSet)
   return (0 != (bits & mask));
 }
 
-void injectSCEx()
-{
+void injectSCEx() {
   static const unsigned char ByteSet[] PROGMEM = {0b01011001, 0b11001001, 0b01001011, 0b01011101, 0b11101010, 0b00000010}; //SCEE
   //static const unsigned char ByteSet[] PROGMEM = {0b01011001, 0b11001001, 0b01001011, 0b01011101, 0b11111010, 0b00000010}; SCEA
   //static const unsigned char ByteSet[] PROGMEM = {0b01011001, 0b11001001, 0b01001011, 0b01011101, 0b11011010, 0b00000010}; //SCEI
 
   for (unsigned char i = 0; i < 44; i++) {
-    if (readBitFromByteSet(i, ByteSet) == 0)
-    {
+    if (readBitFromByteSet(i, ByteSet) == 0) {
       pinMode(DATA_PIN, OUTPUT);
       digitalWrite(DATA_PIN, 0);
       delay(DELAY_BETWEEN_BITS);
-    }
-    else
-    {
+    } else {
       pinMode(DATA_PIN, INPUT);
       delay(DELAY_BETWEEN_BITS);
     }
@@ -80,22 +75,19 @@ void injectSCEx()
   digitalWrite(DATA_PIN, 0);
 }
 
-void setup()
-{
+void setup() {
   pinMode(DATA_PIN, INPUT);
   pinMode(GATE_PIN, INPUT);
   pinMode(LED_PIN, OUTPUT);
 }
 
-void loop()
-{
+void loop() {
   delay(1200);
   pinMode(GATE_PIN, OUTPUT);
   digitalWrite(GATE_PIN, 0);
   delay(100);
 
-  for (unsigned char i = 0; i < 2; i++)
-  {
+  for (unsigned char i = 0; i < 2; i++) {
     digitalWrite(LED_PIN, HIGH);
     injectSCEx();
     digitalWrite(LED_PIN, LOW);
